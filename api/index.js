@@ -12,9 +12,9 @@ const ACCESS_TOKEN = properties.get('access_token'),
     POS_ID = properties.get('pos_id'),
     STORE_ID = properties.get('store_id'),
     /**Agregar el resto de la API de publicacion de ordenes en los espacios de XXX con variables declaradas previamente o con sentencias de la API */
-    MP_ORDER_URL = properties.get('mp_order_basepath') + XXX + '/stores/' + XXX + '/XXX/' + XXX + '/orders' + '?access_token=' + XXX,
+    MP_ORDER_URL = properties.get('mp_order_basepath') + USER_ID + '/stores/' + STORE_ID + '/pos/' + POS_ID + '/orders' + '?access_token=' + ACCESS_TOKEN,
     /**Corregir la variable debajo por la API que corresponda, y reemplazar las variables XXX */
-    MP_ORDERDELETE_URL = properties.get('mp_order_basepath') + XXX + '/stores/' + XXX + '/XXX/' + XXX + '/orders' + '?access_token=' + XXX,
+    MP_ORDERDELETE_URL = properties.get('mp_order_basepath') + USER_ID  + '/pos/' + POS_ID + '/orders' + '?access_token=' + ACCESS_TOKEN,
     MP_MERCHANT_URL = properties.get('mp_merchant_basepath') + '%d?access_token=' + ACCESS_TOKEN;
 
 
@@ -33,12 +33,32 @@ router.post('/order', (req, res) => {
 
     let options = {
         /** Agregar en XXX la variable(url) de publicacion de orden (pista: es una variable declarada previamente) */
-        uri: XXX,
+        uri: MP_ORDER_URL,
         /** Agregar en XXX el metodo de publicacion de orden */
-        method: "XXX",
+        method: "PUT",
         json: true,
         body: {
-            /**Ingresar aqui el JSON para publicar una orden con las constantes mencionadas mas arriba */
+            "external_reference": externalReference,
+            "title": title,
+            "description": description,
+            "notification_url": notification_url,
+            "expiration_date": expiration_date,
+            "total_amount": 100.0,
+            "items": [
+                {
+                    "sku_number": "KS955RUR",
+                    "category": "FOOD",
+                    "title": "Item1",
+                    "description": "Item1 Mercado Pago",
+                    "unit_price": unit_price,
+                    "quantity": quantity,
+                    "unit_measure": "unit",
+                    "total_amount": 100
+                }
+            ],
+            "sponsor": {
+                "id": 446566691
+            }
         }
     }
     console.log(options);
@@ -65,7 +85,7 @@ router.post('/order', (req, res) => {
 
 router.delete('/order', (req, res) => {
     /**Ingresar en el XXX la variable(url) para eliminar una orden (pista: ya la declaramos previamente) */
-    request.delete(XXX, function(err, response, body) {
+    request.delete(MP_ORDERDELETE_URL, function(err, response, body) {
 
         if (err || (response.statusCode !== 204 && response.statusCode !== 200)) {
             console.log(err);
@@ -87,9 +107,9 @@ router.post('/notification', (req, res) => {
 
         let options = {
             /** Ingresar en XXX la variable(url) para buscar una merchant_order (pista: ya la declaramos antes) */
-            uri: util.format(XXX, id),
+            uri: util.format(MP_MERCHANT_URL, id),
             /** Ingresar en XXX el metodo para buscar una merchant_order */
-            method: "XXX"
+            method: "GET"
         }
 
         request(options, function(err, response, body) {
@@ -105,7 +125,7 @@ router.post('/notification', (req, res) => {
         });
     }
     /** Ingresar en XXX la respuesta que debe darse al recibir una notificacion */
-    return res.sendStatus(XXX);
+    return res.sendStatus(200);
 });
 
 /**
